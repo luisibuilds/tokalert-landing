@@ -252,6 +252,15 @@
         .sms-body strong{color:var(--text-primary);font-weight:600}
         .sms-body .critical{color:var(--red);font-weight:700}
 
+        /* ---- TEAM ---- */
+        .team{background:var(--bg-deep)}
+        .team-photo-wrap{max-width:700px;margin:0 auto 2.5rem;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+        .team-photo-wrap img{width:100%;display:block}
+        .team-members{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;max-width:700px;margin:0 auto}
+        .team-member{text-align:center;flex:1;min-width:140px}
+        .team-member .member-name{font-family:var(--font-heading);font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:.25rem}
+        .team-member .member-role{font-size:.8rem;color:var(--text-muted)}
+
         /* ---- CTA ---- */
         .cta-section{position:relative;overflow:hidden}
         .cta-inner{max-width:720px;margin:0 auto;text-align:center;position:relative;z-index:1}
@@ -677,6 +686,29 @@
         </div>
     </section>
 
+    <!-- TEAM -->
+    <section class="section team" id="team">
+        <div class="section-center reveal">
+            <div class="section-label">Ekipi</div>
+            <h2 class="section-title" style="text-align:center">Njihu me ekipin</h2>
+            <p class="section-desc" style="text-align:center">Tre nxënës me një mision — ta bëjnë Shqipërinë më të sigurt.</p>
+        </div>
+        <div class="team-photo-wrap reveal">
+            <img src="team.jpg" alt="Ekipi i TokAlert — Iv Kondo, Luis Lekaj, Ijon Xoxa" loading="lazy">
+        </div>
+        <div class="team-members reveal">
+            <div class="team-member">
+                <div class="member-name">Iv Kondo</div>
+            </div>
+            <div class="team-member">
+                <div class="member-name">Luis Lekaj</div>
+            </div>
+            <div class="team-member">
+                <div class="member-name">Ijon Xoxa</div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA -->
     <section class="section cta-section" id="contact">
         <div class="cta-glow"></div>
@@ -702,6 +734,7 @@
                 <a href="#how">Si Funksionon</a>
                 <a href="#features">Veçoritë</a>
                 <a href="#plan">Plani</a>
+                <a href="#team">Ekipi</a>
             </div>
         </div>
     </footer>
@@ -723,7 +756,7 @@
 
         // ---- Hero typing animation ----
         (function() {
-            const text = 'Sistemi i parë shqiptar i paralajmërimit me sensorë, AI dhe SMS — me kosto 400 herë më të ulët se alternativat komerciale. I ndërtuar nga studentë, për Shqipërinë.';
+            const text = 'Sistemi i parë shqiptar i paralajmërimit me sensorë, AI dhe SMS — me kosto 400 herë më të ulët se alternativat komerciale. I ndërtuar nga nxënës, për Shqipërinë.';
             const el = document.getElementById('heroTyping');
             const cursor = document.getElementById('heroCursor');
             if (!el) return;
