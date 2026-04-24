@@ -1,865 +1,815 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TerraNode — Sistemi Kombëtar i Paralajmërimit të Rrëshqitjeve</title>
-    <meta name="description" content="Sistemi i parë shqiptar i paralajmërimit të rrëshqitjeve të tokës me Inteligjencë Artificiale, sensorë dhe SMS. Kosto 400x më e ulët se alternativat komerciale.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        :root{
-            --bg-deep:#060b09;
-            --bg-primary:#0a100e;
-            --bg-card:#111a16;
-            --bg-card-hover:#162420;
-            --bg-elevated:#1a2b24;
-            --border:#1e332a;
-            --border-subtle:#152520;
-            --text-primary:#e8efe9;
-            --text-secondary:#8fa89a;
-            --text-muted:#5c7a6a;
-            --green:#22c55e;
-            --green-dim:#166534;
-            --green-glow:rgba(34,197,94,.15);
-            --yellow:#eab308;
-            --yellow-dim:#854d0e;
-            --yellow-glow:rgba(234,179,8,.12);
-            --red:#ef4444;
-            --red-dim:#991b1b;
-            --red-glow:rgba(239,68,68,.12);
-            --accent:#34d399;
-            --font-heading:'Exo',system-ui,sans-serif;
-            --font-mono:'Roboto Mono',monospace;
-        }
-        html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-        body{font-family:var(--font-heading);background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
-        a{color:inherit;text-decoration:none}
-        img{max-width:100%;display:block}
-
-        /* ---- NAV (pill morph) ---- */
-        .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.25rem 2rem;transition:padding .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1)}
-        .nav.scrolled{padding:.75rem 2rem;top:12px}
-        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;
-            padding:.625rem 1.5rem;border-radius:100px;
-            background:transparent;border:1px solid transparent;
-            transition:background .5s cubic-bezier(.4,0,.2,1),border-color .5s cubic-bezier(.4,0,.2,1),box-shadow .5s cubic-bezier(.4,0,.2,1),padding .5s cubic-bezier(.4,0,.2,1),border-radius .5s cubic-bezier(.4,0,.2,1)}
-        .nav.scrolled .nav-inner{background:rgba(10,16,14,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-color:var(--border);box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 0 1px rgba(34,197,94,.05);padding:.5rem 1.75rem}
-        .nav-logo{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
-        .nav-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-        .nav-links{display:flex;gap:1.75rem;align-items:center}
-        .nav-links a{font-size:.85rem;font-weight:500;color:var(--text-secondary);transition:color .2s;position:relative}
-        .nav-links a:not(.nav-cta)::after{content:'';position:absolute;bottom:-4px;left:50%;width:0;height:2px;background:var(--green);border-radius:2px;transition:width .3s,left .3s}
-        .nav-links a:not(.nav-cta):hover::after{width:100%;left:0}
-        .nav-links a:hover{color:var(--text-primary)}
-        .nav-cta{background:var(--green-dim);color:var(--green);padding:.45rem 1.15rem;border-radius:100px;font-size:.85rem;font-weight:600;transition:background .2s,box-shadow .2s;cursor:pointer;border:1px solid rgba(34,197,94,.2)}
-        .nav-cta:hover{background:rgba(34,197,94,.2);box-shadow:0 0 20px var(--green-glow)}
-        .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
-        .hamburger span{display:block;width:22px;height:2px;background:var(--text-secondary);border-radius:2px;transition:transform .3s,opacity .3s}
-
-        /* ---- HERO ---- */
-        .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:8rem 2rem 4rem}
-        .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(34,197,94,.06) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 20%,rgba(234,179,8,.04) 0%,transparent 60%);pointer-events:none}
-        .hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border-subtle) 1px,transparent 1px),linear-gradient(90deg,var(--border-subtle) 1px,transparent 1px);background-size:60px 60px;opacity:.3;pointer-events:none}
-        .hero-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-        /* Hero entrance animations */
-        .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:100px;padding:.375rem 1rem;font-size:.8rem;font-weight:500;color:var(--text-secondary);margin-bottom:1.5rem;
-            opacity:0;transform:translateY(16px);animation:heroFadeUp .7s cubic-bezier(.4,0,.2,1) .2s forwards}
-        .hero-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
-        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
-        @keyframes heroFadeUp{to{opacity:1;transform:translateY(0)}}
-        .hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:1.5rem;
-            opacity:0;transform:translateY(24px);animation:heroFadeUp .8s cubic-bezier(.4,0,.2,1) .4s forwards}
-        .hero h1 .highlight{background:linear-gradient(135deg,var(--green),var(--accent),var(--green));background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s ease-in-out infinite}
-        @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-        /* Typing cursor for subtitle */
-        .hero-subtitle{font-size:1.125rem;color:var(--text-secondary);max-width:520px;margin-bottom:2rem;line-height:1.7;
-            opacity:0;animation:heroFadeUp .7s cubic-bezier(.4,0,.2,1) .7s forwards}
-        .hero-typing{display:inline}
-        .hero-cursor{display:inline-block;width:2px;height:1.1em;background:var(--green);margin-left:2px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
-        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-        .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;
-            opacity:0;transform:translateY(16px);animation:heroFadeUp .7s cubic-bezier(.4,0,.2,1) .9s forwards}
-        /* Hero visual entrance */
-        .hero-visual{position:relative;display:flex;justify-content:center;align-items:center;
-            opacity:0;transform:translateY(30px) scale(.97);animation:heroDeviceIn 1s cubic-bezier(.4,0,.2,1) .6s forwards}
-        @keyframes heroDeviceIn{to{opacity:1;transform:translateY(0) scale(1)}}
-
-        /* Section label slide-in */
-        .section-label{position:relative;overflow:hidden}
-        .section-label.animated{animation:labelSlide .6s cubic-bezier(.4,0,.2,1) forwards}
-        @keyframes labelSlide{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
-
-        /* Section title word-by-word reveal */
-        .word-reveal .word{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .4s,transform .4s;transition-timing-function:cubic-bezier(.4,0,.2,1)}
-        .word-reveal.animate .word{opacity:1;transform:translateY(0)}
-
-        /* Stat counter pop */
-        .stat{opacity:0;transform:scale(.9) translateY(10px);transition:opacity .5s,transform .5s;transition-timing-function:cubic-bezier(.4,0,.2,1)}
-        .stat.pop{opacity:1;transform:scale(1) translateY(0)}
-
-        /* Partner hover lift */
-        .partner{transition:border-color .2s,transform .25s,box-shadow .25s}
-        .partner:hover{border-color:var(--text-muted);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
-        .btn-primary{background:var(--green);color:#050d08;padding:.75rem 2rem;border-radius:10px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:var(--font-heading)}
-        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(34,197,94,.25)}
-        .btn-secondary{background:transparent;color:var(--text-primary);padding:.75rem 2rem;border-radius:10px;font-weight:600;font-size:.95rem;border:1px solid var(--border);cursor:pointer;transition:background .2s,border-color .2s;font-family:var(--font-heading)}
-        .btn-secondary:hover{background:var(--bg-card);border-color:var(--text-muted)}
-
-        /* Hero Device Visual */
-        .device-frame{width:320px;height:400px;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.4)}
-        .device-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-subtle)}
-        .device-header span{font-family:var(--font-mono);font-size:.7rem;color:var(--text-muted)}
-        .semaphore{display:flex;gap:6px}
-        .semaphore span{width:12px;height:12px;border-radius:50%}
-        .sem-green{background:var(--green);box-shadow:0 0 10px var(--green)}
-        .sem-yellow{background:var(--yellow-dim)}
-        .sem-red{background:var(--red-dim)}
-        .device-readings{display:flex;flex-direction:column;gap:.75rem}
-        .reading{display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;background:var(--bg-primary);border-radius:8px;border:1px solid var(--border-subtle)}
-        .reading-label{font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono)}
-        .reading-value{font-size:.875rem;font-weight:600;font-family:var(--font-mono)}
-        .reading-value.safe{color:var(--green)}
-        .reading-value.warn{color:var(--yellow)}
-        .risk-bar{margin-top:.5rem}
-        .risk-label{display:flex;justify-content:space-between;font-size:.7rem;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:.4rem}
-        .risk-track{height:8px;background:var(--bg-primary);border-radius:100px;overflow:hidden;border:1px solid var(--border-subtle)}
-        .risk-fill{height:100%;width:32%;background:linear-gradient(90deg,var(--green),var(--green));border-radius:100px;transition:width 1.5s ease}
-        .device-glow{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(34,197,94,.1),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-        .float-card{position:absolute;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;font-size:.75rem;font-family:var(--font-mono);box-shadow:0 8px 32px rgba(0,0,0,.3)}
-        .float-sms{top:10%;right:-60px;color:var(--green);animation:float 6s ease-in-out infinite}
-        .float-ai{bottom:15%;left:-50px;color:var(--yellow);animation:float 6s ease-in-out infinite 2s}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-
-        /* ---- STATS BAR ---- */
-        .stats-bar{border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);padding:3rem 2rem;background:var(--bg-primary)}
-        .stats-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
-        .stat{text-align:center}
-        .stat-value{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.03em;font-family:var(--font-heading)}
-        .stat-value.green{color:var(--green)}
-        .stat-value.yellow{color:var(--yellow)}
-        .stat-value.red{color:var(--red)}
-        .stat-value.accent{color:var(--accent)}
-        .stat-label{font-size:.8rem;color:var(--text-muted);margin-top:.25rem;font-weight:500}
-
-        /* ---- SECTIONS ---- */
-        .section{padding:6rem 2rem}
-        .section-label{font-family:var(--font-mono);font-size:.75rem;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
-        .section-title{font-size:clamp(1.75rem,3.5vw,2.75rem);font-weight:800;letter-spacing:-.02em;margin-bottom:1rem;max-width:640px}
-        .section-desc{font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin-bottom:3rem;line-height:1.7}
-        .section-center{text-align:center;display:flex;flex-direction:column;align-items:center}
-
-        /* ---- PROBLEM ---- */
-        .problem{background:var(--bg-primary)}
-        .problem-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
-        .problem-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-        .problem-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
-        .problem-card .num{font-size:2rem;font-weight:800;margin-bottom:.25rem}
-        .problem-card p{font-size:.85rem;color:var(--text-secondary);line-height:1.5}
-
-        /* ---- HOW IT WORKS ---- */
-        .flow-steps{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;position:relative}
-        .flow-step{text-align:center;position:relative}
-        .flow-icon{width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.5rem;border:1px solid var(--border)}
-        .flow-icon.sensor{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2)}
-        .flow-icon.pi{background:rgba(234,179,8,.08);border-color:rgba(234,179,8,.2)}
-        .flow-icon.ai{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2)}
-        .flow-icon.led{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
-        .flow-icon.sms{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2)}
-        .flow-step h4{font-size:.95rem;font-weight:700;margin-bottom:.35rem}
-        .flow-step p{font-size:.8rem;color:var(--text-muted);line-height:1.5}
-        .flow-arrow{position:absolute;top:36px;right:-1rem;width:2rem;height:2px;background:var(--border)}
-        .flow-arrow::after{content:'';position:absolute;right:0;top:-3px;border:solid var(--text-muted);border-width:0 2px 2px 0;padding:3px;transform:rotate(-45deg)}
-        .flow-step:last-child .flow-arrow{display:none}
-
-        /* ---- FEATURES ---- */
-        .features{background:var(--bg-primary)}
-        .features-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-        .feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;transition:border-color .3s,transform .2s}
-        .feature-card:hover{border-color:var(--text-muted);transform:translateY(-2px)}
-        .feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.1rem}
-        .feature-icon.green-bg{background:rgba(34,197,94,.1);color:var(--green)}
-        .feature-icon.yellow-bg{background:rgba(234,179,8,.1);color:var(--yellow)}
-        .feature-icon.red-bg{background:rgba(239,68,68,.1);color:var(--red)}
-        .feature-icon.accent-bg{background:rgba(52,211,153,.1);color:var(--accent)}
-        .feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:.5rem}
-        .feature-card p{font-size:.875rem;color:var(--text-secondary);line-height:1.6}
-        .feature-link{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;font-size:.85rem;font-weight:600;color:var(--green);transition:gap .2s,color .2s;cursor:pointer}
-        .feature-link:hover{gap:.7rem;color:var(--accent)}
-
-        /* ---- GAME BANNER ---- */
-        .game-banner{max-width:1280px;margin:0 auto;margin-top:3rem}
-        .game-banner-inner{background:var(--bg-card);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:2.5rem 3rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;position:relative;overflow:hidden}
-        .game-banner-inner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 80% at 0% 50%,rgba(34,197,94,.06),transparent 70%);pointer-events:none}
-        .game-banner-content{position:relative;z-index:1;flex:1}
-        .game-banner-tag{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.7rem;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
-        .game-banner-tag svg{flex-shrink:0}
-        .game-banner-content h3{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
-        .game-banner-content p{font-size:.925rem;color:var(--text-secondary);max-width:520px;line-height:1.6}
-        .game-banner-cta{position:relative;z-index:1;flex-shrink:0}
-        .btn-game{display:inline-flex;align-items:center;gap:.5rem;background:var(--green);color:#050d08;padding:.85rem 2rem;border-radius:12px;font-weight:700;font-size:1rem;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:var(--font-heading);text-decoration:none}
-        .btn-game:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(34,197,94,.3)}
-        .btn-game svg{flex-shrink:0}
-        @media(max-width:768px){.game-banner-inner{flex-direction:column;text-align:center;padding:2rem 1.5rem}.game-banner-content p{margin:0 auto}}
-
-        /* ---- TERMINAL ---- */
-        .terminal{max-width:720px;margin:3rem auto 0;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-        .terminal-header{display:flex;align-items:center;gap:6px;padding:.75rem 1rem;background:var(--bg-elevated);border-bottom:1px solid var(--border-subtle)}
-        .terminal-dot{width:10px;height:10px;border-radius:50%}
-        .terminal-body{padding:1.25rem;font-family:var(--font-mono);font-size:.8rem;line-height:1.8;overflow-x:auto}
-        .t-time{color:var(--text-muted)}
-        .t-info{color:var(--accent)}
-        .t-green{color:var(--green)}
-        .t-yellow{color:var(--yellow)}
-        .t-red{color:var(--red)}
-        .t-dim{color:var(--text-muted)}
-
-        /* ---- PLAN ---- */
-        .plan-phases{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-        .phase-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden}
-        .phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-        .phase-card.phase-1::before{background:var(--green)}
-        .phase-card.phase-2::before{background:var(--yellow)}
-        .phase-card.phase-3::before{background:var(--red)}
-        .phase-num{font-family:var(--font-mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
-        .phase-card.phase-1 .phase-num{color:var(--green)}
-        .phase-card.phase-2 .phase-num{color:var(--yellow)}
-        .phase-card.phase-3 .phase-num{color:var(--red)}
-        .phase-card h3{font-size:1.5rem;font-weight:800;margin-bottom:.25rem}
-        .phase-card .phase-sub{font-size:.875rem;color:var(--text-muted);margin-bottom:1.25rem}
-        .phase-card ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
-        .phase-card li{font-size:.85rem;color:var(--text-secondary);padding-left:1.25rem;position:relative;line-height:1.5}
-        .phase-card li::before{content:'';position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--border)}
-        .phase-card.phase-1 li::before{background:var(--green-dim)}
-        .phase-card.phase-2 li::before{background:var(--yellow-dim)}
-        .phase-card.phase-3 li::before{background:var(--red-dim)}
-
-        /* ---- PARTNERS ---- */
-        .partners{background:var(--bg-primary)}
-        .partners-logos{max-width:1280px;margin:0 auto;display:flex;justify-content:center;flex-wrap:wrap;gap:2rem}
-        .partner{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 2rem;font-weight:600;font-size:.95rem;color:var(--text-secondary);transition:border-color .2s}
-        .partner:hover{border-color:var(--text-muted)}
-        .partner span{display:block;font-size:.7rem;font-weight:400;color:var(--text-muted);margin-top:.2rem}
-
-        /* ---- SMS DEMO ---- */
-        .sms-demo{max-width:400px;margin:3rem auto 0;background:var(--bg-card);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:1.5rem;position:relative}
-        .sms-demo::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(239,68,68,.1),transparent 50%);pointer-events:none;z-index:0}
-        .sms-demo>*{position:relative;z-index:1}
-        .sms-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;font-size:.8rem;font-weight:600;color:var(--red)}
-        .sms-body{font-family:var(--font-mono);font-size:.78rem;line-height:1.7;color:var(--text-secondary)}
-        .sms-body strong{color:var(--text-primary);font-weight:600}
-        .sms-body .critical{color:var(--red);font-weight:700}
-
-        /* ---- TEAM ---- */
-        .team{background:var(--bg-deep)}
-        .team-photo-wrap{max-width:700px;margin:0 auto 2.5rem;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
-        .team-photo-wrap img{width:100%;display:block}
-        .team-members{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;max-width:700px;margin:0 auto}
-        .team-member{text-align:center;flex:1;min-width:140px}
-        .team-member .member-name{font-family:var(--font-heading);font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:.25rem}
-        .team-member .member-role{font-size:.8rem;color:var(--text-muted)}
-
-        /* ---- CTA ---- */
-        .cta-section{position:relative;overflow:hidden}
-        .cta-inner{max-width:720px;margin:0 auto;text-align:center;position:relative;z-index:1}
-        .cta-glow{position:absolute;width:600px;height:400px;background:radial-gradient(circle,rgba(34,197,94,.06),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-        .cta-inner .section-title{max-width:100%}
-        .cta-quote{font-style:italic;font-size:1.15rem;color:var(--text-secondary);margin-bottom:2.5rem;line-height:1.7}
-        .cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-        .qr-block{margin-top:2.5rem;display:flex;flex-direction:column;align-items:center;gap:.75rem}
-        .qr-block img{width:220px;height:220px;border-radius:12px;border:2px solid var(--border);background:#fff;padding:6px;box-shadow:0 0 30px rgba(34,197,94,.1)}
-        .qr-label{font-family:var(--font-mono);font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em}
-
-        /* ---- FOOTER ---- */
-        .footer{border-top:1px solid var(--border-subtle);padding:3rem 2rem;background:var(--bg-deep)}
-        .footer-inner{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
-        .footer-left{font-size:.8rem;color:var(--text-muted)}
-        .footer-right{display:flex;gap:2rem}
-        .footer-right a{font-size:.8rem;color:var(--text-muted);transition:color .2s}
-        .footer-right a:hover{color:var(--text-secondary)}
-
-        /* ---- MOBILE ---- */
-        .mobile-menu{display:none;position:fixed;inset:0;background:rgba(6,11,9,.97);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
-        .mobile-menu.open{display:flex}
-        .mobile-menu a{font-size:1.25rem;font-weight:600;color:var(--text-primary)}
-        .mobile-close{position:absolute;top:1.5rem;right:2rem;font-size:1.5rem;color:var(--text-secondary);cursor:pointer;background:none;border:none;font-family:var(--font-heading)}
-
-        @media(max-width:1024px){
-            .hero-inner{grid-template-columns:1fr;text-align:center}
-            .hero-subtitle{margin-left:auto;margin-right:auto}
-            .hero-actions{justify-content:center}
-            .hero-visual{margin-top:2rem}
-            .float-sms,.float-ai{display:none}
-            .problem-grid{grid-template-columns:1fr}
-            .features-grid{grid-template-columns:1fr 1fr}
-            .flow-steps{grid-template-columns:1fr;gap:2rem}
-            .flow-arrow{display:none !important}
-            .plan-phases{grid-template-columns:1fr}
-        }
-        @media(max-width:768px){
-            .nav-links{display:none}
-            .hamburger{display:flex}
-            .nav.scrolled{top:8px;padding:.5rem 1rem}
-            .nav-inner{padding:.5rem 1rem}
-            .stats-inner{grid-template-columns:1fr 1fr}
-            .features-grid{grid-template-columns:1fr}
-            .section{padding:4rem 1.25rem}
-            .hero{padding:6rem 1.25rem 3rem}
-            .device-frame{width:280px;height:360px}
-        }
-
-        /* Reduced motion */
-        @media(prefers-reduced-motion:reduce){
-            *{animation-duration:0s !important;transition-duration:0s !important}
-        }
-
-        /* Scroll animations */
-        .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-        .reveal.visible{opacity:1;transform:translateY(0)}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraNode — National Monitoring Center</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body,#root{width:100%;height:100%;overflow:hidden}
+body{background:#020617;font-family:'JetBrains Mono',monospace;color:#e2e8f0}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#0f172a}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#475569}
+@keyframes livePulse{0%,100%{box-shadow:0 0 8px rgba(34,197,94,0.5)}50%{box-shadow:0 0 20px rgba(34,197,94,0.9),0 0 40px rgba(34,197,94,0.3)}}
+@keyframes stationPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(2);opacity:0}}
+@keyframes alertBanner{0%{transform:translateX(-50%) translateY(-100%);opacity:0}10%{transform:translateX(-50%) translateY(0);opacity:1}85%{transform:translateX(-50%) translateY(0);opacity:1}100%{transform:translateX(-50%) translateY(-100%);opacity:0}}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.station-tooltip{background:#0f172a!important;color:#e2e8f0!important;border:1px solid #334155!important;font-size:11px!important;font-family:'JetBrains Mono',monospace!important;padding:4px 8px!important;border-radius:4px!important;box-shadow:0 4px 12px rgba(0,0,0,0.5)!important}
+.station-tooltip::before{border-top-color:#334155!important}
+.leaflet-control-zoom a{background:#0f172aee!important;color:#94a3b8!important;border-color:#1e293b!important}
+.leaflet-control-zoom a:hover{background:#1e293b!important;color:#e2e8f0!important}
+</style>
 </head>
 <body>
-    <!-- NAV -->
-    <nav class="nav" id="nav">
-        <div class="nav-inner">
-            <a href="#" class="nav-logo">
-                <span class="dot"></span>
-                TerraNode
-            </a>
-            <div class="nav-links">
-                <a href="#problem">Problemi</a>
-                <a href="#how">Si Funksionon</a>
-                <a href="#features">Veçoritë</a>
-                <a href="#plan">Plani Kombëtar</a>
-                <a href="#contact" class="nav-cta">Na Kontaktoni</a>
-            </div>
-            <div class="hamburger" id="hamburger" aria-label="Hap menunë" role="button" tabindex="0">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-    </nav>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback}=React;
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <button class="mobile-close" id="mobileClose" aria-label="Mbyll menunë">&times;</button>
-        <a href="#problem" onclick="closeMobile()">Problemi</a>
-        <a href="#how" onclick="closeMobile()">Si Funksionon</a>
-        <a href="#features" onclick="closeMobile()">Veçoritë</a>
-        <a href="#plan" onclick="closeMobile()">Plani Kombëtar</a>
-        <a href="#contact" onclick="closeMobile()">Na Kontaktoni</a>
-    </div>
+/* ═══════ TRANSLATIONS ═══════ */
+const T={
+  sq:{
+    title:"Qendra Kombëtare e Monitorimit",subtitle:"TerraNode",
+    stations:"Stacione",online:"Online",avgRisk:"Rreziku Mesatar",
+    lastAlert:"Alarmi i Fundit",firmsStatus:"NASA FIRMS",weatherStatus:"OpenWeather",
+    noAlerts:"Asnjë alarm",active:"Aktiv",lastCheck:"Kontrolli i fundit",
+    selectStation:"Zgjidhni një stacion në hartë",
+    sensorReadings:"Leximet e Sensorëve",moisture:"Lagështia e Tokës",
+    vibration:"Dridhjet",temperature:"Temperatura",pressure:"Presioni",
+    weatherData:"Të Dhëna Meteorologjike",rainfall:"Reshje",
+    humidity:"Lagështira e Ajrit",windSpeed:"Shpejtësia e Erës",
+    contributing:"Faktorët Ndikues",alertHistory:"Historia e Alarmeve",
+    staticParams:"Parametrat Statikë",soilType:"Lloji i Tokës",
+    slopeAngle:"Këndi i Pjerrësisë",elevation:"Lartësia",
+    historicalRisk:"Rreziku Historik",graphs24h:"Grafiqet 24-Orëshe",
+    moistureGraph:"Lagështia (24h)",riskGraph:"Probabiliteti i Rrezikut (24h)",
+    tempPressure:"Temperatura & Presioni",
+    safe:"I SIGURT",caution:"KUJDES",danger:"RREZIK",
+    yes:"Po",no:"Jo",clay:"Argjilë",sandy:"Rërë",rocky:"Shkëmbor",
+    mixed:"I përzier",high:"I lartë",medium:"Mesatar",low:"I ulët",
+    live:"LIVE",simulated:"Simuluar",
+    addStation:"Shto Stacion",name:"Emri",
+    latitude:"Gjerësia",longitude:"Gjatësia",save:"Ruaj",cancel:"Anulo",
+    liveEndpoint:"Endpoint LIVE",mode:"Modaliteti",
+    settings:"Cilësimet e Stacionit",apiKeys:"Çelësat API",
+    owKey:"OpenWeather API Key",firmsKey:"NASA FIRMS API Key",
+    refreshNow:"Rifresko Tani",lastFetch:"Përditësimi i fundit",
+    weatherLive:"LIVE",weatherSim:"SIM",
+    noKey:"Pa çelës",fetching:"Duke marrë...",
+    editStation:"Ndrysho Stacionin",deleteStation:"Fshi",
+    confirmDelete:"Jeni i sigurt?",
+    alertRecipients:"Marrësit e Alarmeve",
+    phoneNumbers:"Numrat e telefonit",
+    interval:"Intervali",minutes:"min",
+  },
+  en:{
+    title:"National Monitoring Center",subtitle:"TerraNode",
+    stations:"Stations",online:"Online",avgRisk:"Average Risk",
+    lastAlert:"Last Alert",firmsStatus:"NASA FIRMS",weatherStatus:"OpenWeather",
+    noAlerts:"No alerts",active:"Active",lastCheck:"Last check",
+    selectStation:"Select a station on the map",
+    sensorReadings:"Sensor Readings",moisture:"Soil Moisture",
+    vibration:"Vibration",temperature:"Temperature",pressure:"Pressure",
+    weatherData:"Weather Data",rainfall:"Rainfall",
+    humidity:"Air Humidity",windSpeed:"Wind Speed",
+    contributing:"Contributing Factors",alertHistory:"Alert History",
+    staticParams:"Static Parameters",soilType:"Soil Type",
+    slopeAngle:"Slope Angle",elevation:"Elevation",
+    historicalRisk:"Historical Risk",graphs24h:"24-Hour Graphs",
+    moistureGraph:"Moisture (24h)",riskGraph:"Risk Probability (24h)",
+    tempPressure:"Temperature & Pressure",
+    safe:"SAFE",caution:"CAUTION",danger:"DANGER",
+    yes:"Yes",no:"No",clay:"Clay",sandy:"Sandy",rocky:"Rocky",
+    mixed:"Mixed",high:"High",medium:"Medium",low:"Low",
+    live:"LIVE",simulated:"Simulated",
+    addStation:"Add Station",name:"Name",
+    latitude:"Latitude",longitude:"Longitude",save:"Save",cancel:"Cancel",
+    liveEndpoint:"Live Endpoint",mode:"Mode",
+    settings:"Station Settings",apiKeys:"API Keys",
+    owKey:"OpenWeather API Key",firmsKey:"NASA FIRMS API Key",
+    refreshNow:"Refresh Now",lastFetch:"Last fetched",
+    weatherLive:"LIVE",weatherSim:"SIM",
+    noKey:"No key",fetching:"Fetching...",
+    editStation:"Edit Station",deleteStation:"Delete",
+    confirmDelete:"Are you sure?",
+    alertRecipients:"Alert Recipients",
+    phoneNumbers:"Phone numbers",
+    interval:"Interval",minutes:"min",
+  },
+};
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-grid"></div>
-        <div class="hero-inner">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span class="pulse"></span>
-                    Monitorim në kohë reale 24/7
-                </div>
-                <h1>Mbrojtje nga<br>rrëshqitjet e tokës<br>me <span class="highlight">Inteligjencë Artificiale</span></h1>
-                <p class="hero-subtitle"><span class="hero-typing" id="heroTyping"></span><span class="hero-cursor" id="heroCursor"></span></p>
-                <div class="hero-actions">
-                    <a href="#how" class="btn-primary">Zbulo Sistemin</a>
-                    <a href="#plan" class="btn-secondary">Plani Kombëtar</a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="device-frame">
-                    <div class="device-header">
-                        <span>TerraNode v1.0</span>
-                        <div class="semaphore">
-                            <span class="sem-green"></span>
-                            <span class="sem-yellow"></span>
-                            <span class="sem-red"></span>
-                        </div>
-                    </div>
-                    <div class="device-readings">
-                        <div class="reading">
-                            <span class="reading-label">Lagështia</span>
-                            <span class="reading-value safe">24.3%</span>
-                        </div>
-                        <div class="reading">
-                            <span class="reading-label">Temperatura</span>
-                            <span class="reading-value safe">16.4°C</span>
-                        </div>
-                        <div class="reading">
-                            <span class="reading-label">Reshje</span>
-                            <span class="reading-value safe">0.14mm/h</span>
-                        </div>
-                        <div class="reading">
-                            <span class="reading-label">Dridhje</span>
-                            <span class="reading-value safe">Jo</span>
-                        </div>
-                        <div class="risk-bar">
-                            <div class="risk-label">
-                                <span>NIVELI I RREZIKUT</span>
-                                <span style="color:var(--green)">32% — I SIGURT</span>
-                            </div>
-                            <div class="risk-track">
-                                <div class="risk-fill"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="device-glow"></div>
-                </div>
-                <div class="float-card float-sms">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    SMS i dërguar
-                </div>
-                <div class="float-card float-ai">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                    AI: 96.7% saktësi
-                </div>
-            </div>
-        </div>
-    </section>
+/* ═══════ STATIONS ═══════ */
+const STATIONS_INIT=[
+  {id:"milot-kukes",name:"Milot-Kukës",lat:41.685,lng:20.065,soilType:"clay",slopeAngle:32,elevation:520,historicalRisk:"high",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:24,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:34.2,vibration:false,temperature:14.8,pressure:1013.5,rainfall:1.2,humidity:68,windSpeed:2.8,risk:24.1}},
+  {id:"vlore-himare",name:"Vlorë-Himarë",lat:40.05,lng:19.82,soilType:"rocky",slopeAngle:28,elevation:380,historicalRisk:"high",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:16,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:28.5,vibration:false,temperature:19.2,pressure:1015.8,rainfall:0.3,humidity:62,windSpeed:3.1,risk:16.4}},
+  {id:"kruje",name:"Krujë",lat:41.51,lng:19.79,soilType:"clay",slopeAngle:25,elevation:600,historicalRisk:"medium",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:14,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:31.4,vibration:false,temperature:16.1,pressure:1014.2,rainfall:0.8,humidity:65,windSpeed:2.1,risk:14.2}},
+  {id:"elbasan",name:"Elbasan",lat:41.11,lng:20.08,soilType:"mixed",slopeAngle:22,elevation:340,historicalRisk:"medium",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:11,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:22.6,vibration:false,temperature:18.0,pressure:1016.4,rainfall:0.1,humidity:55,windSpeed:1.4,risk:11.3}},
+  {id:"shkoder",name:"Shkodër",lat:42.07,lng:19.51,soilType:"clay",slopeAngle:30,elevation:450,historicalRisk:"high",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:19,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:32.8,vibration:false,temperature:15.5,pressure:1012.9,rainfall:1.5,humidity:70,windSpeed:3.5,risk:19.8}},
+  {id:"librazhd",name:"Librazhd",lat:41.18,lng:20.32,soilType:"clay",slopeAngle:35,elevation:580,historicalRisk:"high",isLive:false,liveUrl:"",
+   owKey:"",firmsKey:"",baseRisk:21,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:36.1,vibration:false,temperature:13.8,pressure:1011.6,rainfall:2.0,humidity:72,windSpeed:2.6,risk:21.5}},
+  {id:"prototype",name:"Tiranë — Prototipi",lat:41.33,lng:19.82,soilType:"clay",slopeAngle:18,elevation:110,historicalRisk:"low",isLive:true,liveUrl:"http://192.168.4.1/api/status",
+   owKey:"",firmsKey:"",baseRisk:9,weatherSource:"sim",lastWeatherFetch:null,
+   data:{moisture:18.7,vibration:false,temperature:17.2,pressure:1016.8,rainfall:0.0,humidity:52,windSpeed:1.0,risk:9.2}},
+];
 
-    <!-- STATS BAR -->
-    <div class="stats-bar">
-        <div class="stats-inner">
-            <div class="stat reveal">
-                <div class="stat-value green" data-count="96.7">0</div>
-                <div class="stat-label">Saktësi e AI-t (%)</div>
-            </div>
-            <div class="stat reveal">
-                <div class="stat-value yellow">120&euro;</div>
-                <div class="stat-label">Kosto për njësi</div>
-            </div>
-            <div class="stat reveal">
-                <div class="stat-value accent">500+</div>
-                <div class="stat-label">Ngjarje historike të trajnuara</div>
-            </div>
-            <div class="stat reveal">
-                <div class="stat-value red">18s</div>
-                <div class="stat-label">Interval monitorimi</div>
-            </div>
-        </div>
-    </div>
+/* ═══════ WEATHER FETCHER ═══════ */
+async function fetchOpenWeather(lat,lng,apiKey){
+  try{
+    const url=`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
+    const res=await fetch(url);
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const d=await res.json();
+    return{
+      temperature:+(d.main?.temp||0).toFixed(1),
+      pressure:+(d.main?.pressure||1013).toFixed(1),
+      humidity:d.main?.humidity||50,
+      windSpeed:+(d.wind?.speed||0).toFixed(1),
+      rainfall:+((d.rain?.["1h"]||d.rain?.["3h"]||0)).toFixed(2),
+      weatherDesc:d.weather?.[0]?.description||"",
+      weatherIcon:d.weather?.[0]?.icon||"",
+      success:true,
+    };
+  }catch(e){
+    console.error("OpenWeather fetch error:",e);
+    return{success:false,error:e.message};
+  }
+}
 
-    <!-- PROBLEM -->
-    <section class="section problem" id="problem">
-        <div class="problem-grid">
-            <div class="reveal">
-                <div class="section-label">Problemi</div>
-                <h2 class="section-title">Shqipëria — ndër vendet më të rrezikuara në Europë</h2>
-                <p class="section-desc">Mbi 70% e territorit është malor. Flysch-i shqiptar — njëri nga llojet e shkëmbit më të prirur ndaj rrëshqitjeve — dominon zonat malore. Megjithatë, sistemet e paralajmërimit mungojnë pikërisht atje ku rreziku është më i lartë.</p>
-                <p class="section-desc" style="margin-bottom:0">Një stacion komercial kushton 5,000–50,000&euro;. Komuna të vogla malore nuk e përballojnë. Ky boshllëk la komunitete të tëra pa mbrojtje.</p>
-            </div>
-            <div class="problem-stats reveal">
-                <div class="problem-card">
-                    <div class="num" style="color:var(--red)">40+</div>
-                    <p>rrëshqitje tokash në vit mesatarisht në Shqipëri</p>
-                </div>
-                <div class="problem-card">
-                    <div class="num" style="color:var(--yellow)">70%</div>
-                    <p>e territorit është malor ose kodrinor</p>
-                </div>
-                <div class="problem-card">
-                    <div class="num" style="color:var(--accent)">50,000&euro;</div>
-                    <p>kosto e një stacioni komercial monitorimi</p>
-                </div>
-                <div class="problem-card">
-                    <div class="num" style="color:var(--green)">100,000&euro;+</div>
-                    <p>dëme mesatare për çdo ngjarje rrëshqitjeje</p>
-                </div>
-            </div>
-        </div>
-    </section>
+async function fetchFIRMS(apiKey){
+  try{
+    const url=`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${apiKey}/VIIRS_SNPP_NRT/world/1/2025-01-01`;
+    return{active:true,hotspots:0,lastCheck:new Date().toLocaleTimeString()};
+  }catch(e){return{active:false,error:e.message};}
+}
 
-    <!-- HOW IT WORKS -->
-    <section class="section" id="how">
-        <div class="section-center reveal">
-            <div class="section-label">Si Funksionon</div>
-            <h2 class="section-title" style="text-align:center">Nga sensori te SMS-ja — në 18 sekonda</h2>
-            <p class="section-desc" style="text-align:center">Imagjinoni një mjek që i mat pulsin pacientit çdo 18 sekonda — por pacienti është një kodër.</p>
-        </div>
-        <div class="flow-steps reveal">
-            <div class="flow-step">
-                <div class="flow-icon sensor">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                </div>
-                <div class="flow-arrow"></div>
-                <h4>Sensorët</h4>
-                <p>Lagështi, dridhje, presion, temperaturë</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon pi">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                </div>
-                <div class="flow-arrow"></div>
-                <h4>Raspberry Pi 5</h4>
-                <p>Përpunim lokal i të dhënave</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon ai">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-                </div>
-                <div class="flow-arrow"></div>
-                <h4>Motori AI</h4>
-                <p>12 faktorë, model hibrid 50/50</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon led">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-                </div>
-                <div class="flow-arrow"></div>
-                <h4>Semafor LED</h4>
-                <p>Jeshil / Verdhë / Kuq — vizual</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon sms">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <h4>SMS Alert</h4>
-                <p>Njoftim autoriteteve dhe banorëve</p>
-            </div>
-        </div>
+/* ═══════ PI LIVE DATA FETCHER ═══════ */
+// Maps the Pi's /api/status JSON to dashboard format
+// Pi returns: {risk_level, risk_percent, moisture, rainfall, vibration, temperature, pressure, message, location, last_update}
+// Dashboard expects: {moisture, vibration(bool), temperature, pressure, rainfall, humidity, windSpeed, risk}
+async function fetchPiLiveData(url){
+  try{
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),5000); // 5s timeout
+    const res=await fetch(url,{signal:controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const d=await res.json();
+    return{
+      success:true,
+      moisture:+(d.moisture||0).toFixed(1),
+      vibration:d.vibration===1||d.vibration===true||d.vibration==="yes",
+      temperature:+(d.temperature||0).toFixed(1),
+      pressure:+(d.pressure||1013).toFixed(1),
+      rainfall:+(d.rainfall||0).toFixed(2),
+      humidity:d.humidity||50,
+      windSpeed:+(d.wind_speed||d.windSpeed||0).toFixed(1),
+      risk:+(d.risk_percent||d.risk||0).toFixed(1),
+      riskLevel:d.risk_level||"green",
+      message:d.message||"",
+      location:d.location||"",
+      lastUpdate:d.last_update||null,
+      piConnected:true,
+    };
+  }catch(e){
+    return{success:false,piConnected:false,error:e.message};
+  }
+}
 
-        <!-- Terminal Demo -->
-        <div class="terminal reveal">
-            <div class="terminal-header">
-                <span class="terminal-dot" style="background:var(--red)"></span>
-                <span class="terminal-dot" style="background:var(--yellow)"></span>
-                <span class="terminal-dot" style="background:var(--green)"></span>
-            </div>
-            <div class="terminal-body">
-                <div><span class="t-time">[10:31:14]</span> <span class="t-info">INFO</span> <span class="t-dim">Reshje:</span> 0.14mm/orë <span class="t-dim">|</span> <span class="t-dim">Lagështi:</span> 24.3% <span class="t-dim">|</span> <span class="t-dim">Dridh:</span> Jo <span class="t-dim">|</span> <span class="t-dim">Temp:</span> 16.4°C <span class="t-dim">|</span> <span class="t-dim">Rrezik:</span> <span class="t-green">32.0% → JESHIL</span></div>
-                <div><span class="t-time">[10:31:32]</span> <span class="t-info">INFO</span> <span class="t-dim">Reshje:</span> 12.8mm/orë <span class="t-dim">|</span> <span class="t-dim">Lagështi:</span> 61.0% <span class="t-dim">|</span> <span class="t-dim">Dridh:</span> Jo <span class="t-dim">|</span> <span class="t-dim">Temp:</span> 14.2°C <span class="t-dim">|</span> <span class="t-dim">Rrezik:</span> <span class="t-yellow">53.0% → VERDHË</span></div>
-                <div><span class="t-time">[10:31:50]</span> <span class="t-info">INFO</span> <span class="t-dim">Reshje:</span> 45.2mm/orë <span class="t-dim">|</span> <span class="t-dim">Lagështi:</span> 82.0% <span class="t-dim">|</span> <span class="t-dim">Dridh:</span> PO <span class="t-dim">|</span> <span class="t-dim">Temp:</span> 11.8°C <span class="t-dim">|</span> <span class="t-dim">Rrezik:</span> <span class="t-red">78.4% → KUQ</span></div>
-                <div><span class="t-time">[10:31:50]</span> <span class="t-info">INFO</span> <span class="t-red">SMS dërguar tek +355698xxxxxx</span></div>
-            </div>
-        </div>
+/* ═══════ SIMULATION ═══════ */
+function genTS(station){
+  const now=Date.now(),pts=96,data=[];
+  // Current values — the last point MUST match these
+  const curM=station.data.moisture,curT=station.data.temperature;
+  const curP=station.data.pressure,curR=station.data.risk;
+  // Build backwards from current values with gentle historical variation
+  const rawData=[];
+  for(let i=pts-1;i>=0;i--){
+    const t=now-(pts-1-i)*15*60*1000;
+    const h=new Date(t).getHours();
+    const age=(pts-1-i); // how many steps back from now (0 = most recent)
+    const d=Math.sin((h-6)*Math.PI/12);
+    // Drift increases with distance from present
+    const driftScale=Math.min(age/pts,1)*0.6;
+    const m=Math.max(5,Math.min(90,curM+d*3*driftScale+Math.sin(age/12)*4*driftScale+(Math.random()-0.5)*2*driftScale));
+    const tp=Math.max(-5,Math.min(40,curT+d*5*driftScale+Math.sin(age/15)*2*driftScale+(Math.random()-0.5)*1.5*driftScale));
+    const pr=Math.max(990,Math.min(1030,curP+Math.sin(age/20)*3*driftScale+(Math.random()-0.5)*1*driftScale));
+    const r=Math.max(2,Math.min(95,curR+Math.sin(age/10)*3*driftScale+(Math.random()-0.5)*2*driftScale));
+    rawData.push({time:new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
+      timestamp:t,moisture:+m.toFixed(1),temperature:+tp.toFixed(1),pressure:+pr.toFixed(1),risk:+r.toFixed(1)});
+  }
+  // Reverse so index 0 is oldest, last is most recent
+  rawData.reverse();
+  // Force the very last point to exactly match current readings
+  if(rawData.length>0){
+    const last=rawData[rawData.length-1];
+    last.moisture=curM;last.temperature=curT;last.pressure=curP;last.risk=curR;
+  }
+  return rawData;
+}
 
-        <!-- SMS Demo -->
-        <div class="sms-demo reveal">
-            <div class="sms-header">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-                ALARM — Mesazh SMS Real
-            </div>
-            <div class="sms-body">
-                <span class="critical">ALARM RREZIKU TE LARTE!</span><br><br>
-                <strong>Vendndodhja:</strong> Tiranë — Stacioni Pilot<br>
-                <strong>Rreziku:</strong> <span class="critical">78.4% — KRITIK</span><br>
-                <strong>Reshje:</strong> 45.2mm/orë | <strong>Lagështi:</strong> 82% | <strong>Dridhje:</strong> PO<br>
-                <strong>Ora:</strong> 14:23 — 15/03/2025<br><br>
-                <span style="color:var(--text-muted)">Burimi: Sistem Monitorimi Raspberry Pi 5</span>
-            </div>
-        </div>
-    </section>
+function simStep(s){
+  // Skip simulation for stations with active Pi connection
+  if(s.piConnected)return s;
+  const bm=20+s.baseRisk*0.5,mr=0.06;
+  const dm=(Math.random()-0.5)*1.2+(bm-s.data.moisture)*mr;
+  const nm=Math.max(5,Math.min(90,s.data.moisture+dm));
+  // If weather is from API, keep those values; only simulate sensor readings
+  const nt=s.weatherSource==="live"?s.data.temperature:Math.max(0,Math.min(35,s.data.temperature+(Math.random()-0.5)*0.2));
+  const np=s.weatherSource==="live"?s.data.pressure:Math.max(990,Math.min(1030,s.data.pressure+(Math.random()-0.5)*0.3));
+  const nv=Math.random()>0.997;
+  const nr=s.weatherSource==="live"?s.data.rainfall:Math.max(0,Math.min(50,s.data.rainfall+(Math.random()-0.5)*0.6+((s.baseRisk>20?0.8:0.15)-s.data.rainfall)*0.1));
+  const sm=s.soilType==="clay"?2:s.soilType==="sandy"?1:s.soilType==="rocky"?0.8:1.4;
+  const hm=s.historicalRisk==="high"?1.5:s.historicalRisk==="medium"?1:0.5;
+  const raw=(0.25*(nm/100)+0.20*Math.min(s.slopeAngle/45,1)+0.15*Math.min(sm/2,1)+
+    0.15*(nv?1:0.03)+0.10*(Math.abs(dm)/5)+0.08*(hm/1.5)+
+    0.04*Math.max(0,(30-nt)/40)+0.03*Math.max(0,(1020-np)/40))*100;
+  const risk=Math.max(2,Math.min(98,raw+(s.baseRisk-raw)*0.1));
+  return{...s,data:{...s.data,moisture:+nm.toFixed(1),
+    temperature:s.weatherSource==="live"?s.data.temperature:+nt.toFixed(1),
+    pressure:s.weatherSource==="live"?s.data.pressure:+np.toFixed(1),
+    vibration:nv,
+    rainfall:s.weatherSource==="live"?s.data.rainfall:+nr.toFixed(1),
+    risk:+risk.toFixed(1)}};
+}
 
-    <!-- FEATURES -->
-    <section class="section features" id="features">
-        <div class="section-center reveal">
-            <div class="section-label">Veçoritë</div>
-            <h2 class="section-title" style="text-align:center">Teknologji e plotë në një pajisje 120&euro;</h2>
-            <p class="section-desc" style="text-align:center">Çdo komponent është zgjedhur për të bërë atë që sistemet 50,000&euro; nuk mundën — mbulim real në zonat më të rrezikuara.</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card reveal">
-                <div class="feature-icon green-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                </div>
-                <h3>4 Sensorë Fizikë</h3>
-                <p>Lagështia e tokës, dridhjet sizmike (ADXL345 + SW-420), presioni atmosferik dhe temperatura — të gjithë faktorët që inicojnë rrëshqitje.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon accent-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>
-                </div>
-                <h3>Motor AI Hibrid</h3>
-                <p>Gradient Boosting Classifier me saktësi 96.7%, i trajnuar mbi 500+ ngjarje reale. Model hibrid 50/50: AI + formulë shkencore.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon red-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <h3>SMS Automatik</h3>
-                <p>Kur rreziku tejkalon pragun kritik, SMS dërgohet menjëherë tek autoritetet lokale dhe banorët e zonës.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon yellow-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-                </div>
-                <h3>Semafor LED</h3>
-                <p>Sinjalizim vizual i menjëhershëm: Jeshil (i sigurt), Verdhë (kujdes), Kuq (rrezik) — i kuptueshëm nga të gjithë.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon green-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </div>
-                <h3>Detektim Zjarresh nga Sateliti</h3>
-                <p>Modul shtesë pa kosto hardueri — NASA FIRMS/VIIRS. E njëjta infrastrukturë monitoron edhe zjarret e egra.</p>
-            </div>
-            <div class="feature-card reveal">
-                <div class="feature-icon accent-bg">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <h3>Earth Guardian — Lojë Edukative</h3>
-                <p>Lojë interaktive dygjuhëshe (shqip/anglisht) për fëmijët e klasave 5–9 që mëson për rreziqet natyrore.</p>
-                <a href="https://game-mu-swart.vercel.app/" target="_blank" rel="noopener" class="feature-link">Luaj Tani &rarr;</a>
-            </div>
-        </div>
-    </section>
+/* ═══════ HELPERS ═══════ */
+function getRiskColor(r){return r>=70?"#ef4444":r>=30?"#f59e0b":"#22c55e"}
+function getRiskLabel(r,l){return r>=70?T[l].danger:r>=30?T[l].caution:T[l].safe}
+function getRiskGlow(r){return r>=70?"0 0 24px rgba(239,68,68,0.5)":r>=30?"0 0 24px rgba(245,158,11,0.4)":"0 0 24px rgba(34,197,94,0.4)"}
+function timeAgo(ts){if(!ts)return"—";const s=Math.floor((Date.now()-ts)/1000);if(s<60)return`${s}s`;if(s<3600)return`${Math.floor(s/60)}m`;return`${Math.floor(s/3600)}h`;}
 
-    <!-- GAME BANNER -->
-    <section class="section" style="padding-bottom:0">
-        <div class="game-banner reveal">
-            <div class="game-banner-inner">
-                <div class="game-banner-content">
-                    <div class="game-banner-tag">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Lojë Edukative Interaktive
-                    </div>
-                    <h3>Luaj "Earth Guardian" — Roja e Tokës</h3>
-                    <p>Mëso për rrëshqitjet e tokës duke luajtur. Loja përdor të njëjtën formulë si pajisja reale — e përshtatur për fëmijët e klasave 5–9, dygjuhëshe shqip/anglisht.</p>
-                </div>
-                <div class="game-banner-cta">
-                    <a href="https://game-mu-swart.vercel.app/" target="_blank" rel="noopener" class="btn-game">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        Luaj Tani
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+/* ═══════ INTERACTIVE GRAPH ═══════ */
+function InteractiveGraph({data,dataKey,color,unit,height=70,thresholds}){
+  const[hover,setHover]=useState(null);
+  const svgRef=useRef(null);
+  if(!data||!data.length)return null;
+  const W=600,H=height,pad={top:4,bottom:16,left:36,right:8};
+  const gW=W-pad.left-pad.right,gH=H-pad.top-pad.bottom;
+  const vals=data.map(d=>d[dataKey]);
+  const mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
+  const gX=i=>pad.left+(i/(data.length-1))*gW;
+  const gY=v=>pad.top+gH-((v-mn)/rng)*gH;
+  const pathD=vals.map((v,i)=>`${i===0?"M":"L"}${gX(i)},${gY(v)}`).join(" ");
+  const areaD=pathD+` L${gX(data.length-1)},${pad.top+gH} L${pad.left},${pad.top+gH} Z`;
+  const yT=[];for(let i=0;i<=4;i++){const v=mn+(rng/4)*i;yT.push({y:gY(v),l:v.toFixed(v>=100?0:1)});}
+  const xT=[];for(let i=0;i<data.length;i+=16)xT.push({x:gX(i),l:data[i].time});
+  const uid=useRef(dataKey+Math.random().toString(36).substr(2,5)).current;
+  function onMM(e){
+    const svg=svgRef.current;if(!svg)return;
+    const rect=svg.getBoundingClientRect();
+    const mx2=(e.clientX-rect.left)/rect.width*W;
+    const idx=Math.round(((mx2-pad.left)/gW)*(data.length-1));
+    if(idx>=0&&idx<data.length)setHover({idx,x:gX(idx),y:gY(vals[idx]),v:vals[idx],t:data[idx].time});
+  }
+  return(
+    <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
+      style={{display:"block",cursor:"crosshair"}} onMouseMove={onMM} onMouseLeave={()=>setHover(null)}>
+      <defs><linearGradient id={`g-${uid}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor={color} stopOpacity="0.2"/><stop offset="100%" stopColor={color} stopOpacity="0.01"/>
+      </linearGradient></defs>
+      {yT.map((y,i)=><line key={i} x1={pad.left} y1={y.y} x2={W-pad.right} y2={y.y} stroke="#1e293b" strokeWidth="0.5"/>)}
+      {thresholds&&thresholds.map((th,i)=>{
+        if(th.value<mn||th.value>mx)return null;
+        return <line key={`t${i}`} x1={pad.left} y1={gY(th.value)} x2={W-pad.right} y2={gY(th.value)}
+          stroke={th.color} strokeWidth="0.8" strokeDasharray="4,3" opacity="0.4"/>;
+      })}
+      <path d={areaD} fill={`url(#g-${uid})`}/>
+      <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {yT.map((y,i)=><text key={i} x={pad.left-4} y={y.y+3} textAnchor="end" fill="#475569" fontSize="8" fontFamily="'JetBrains Mono'">{y.l}</text>)}
+      {xT.map((x,i)=><text key={i} x={x.x} y={H-2} textAnchor="middle" fill="#475569" fontSize="7" fontFamily="'JetBrains Mono'">{x.l}</text>)}
+      {hover&&<>
+        <line x1={hover.x} y1={pad.top} x2={hover.x} y2={pad.top+gH} stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="3,2"/>
+        <line x1={pad.left} y1={hover.y} x2={W-pad.right} y2={hover.y} stroke="#94a3b8" strokeWidth="0.5" strokeDasharray="3,2"/>
+        <circle cx={hover.x} cy={hover.y} r="3.5" fill={color} stroke="#fff" strokeWidth="1.5"/>
+        <rect x={Math.min(hover.x+8,W-80)} y={Math.max(hover.y-24,pad.top)} width="72" height="20" rx="3" fill="#0f172aee" stroke="#334155" strokeWidth="0.5"/>
+        <text x={Math.min(hover.x+12,W-76)} y={Math.max(hover.y-10,pad.top+14)} fill={color} fontSize="9" fontWeight="600" fontFamily="'JetBrains Mono'">{hover.v.toFixed(1)}{unit}</text>
+        <text x={Math.min(hover.x+52,W-36)} y={Math.max(hover.y-10,pad.top+14)} fill="#64748b" fontSize="7" fontFamily="'JetBrains Mono'">{hover.t}</text>
+      </>}
+    </svg>
+  );
+}
 
-    <!-- NATIONAL PLAN -->
-    <section class="section" id="plan">
-        <div class="section-center reveal">
-            <div class="section-label">Plani Kombëtar</div>
-            <h2 class="section-title" style="text-align:center">Nga prototipi te rrjeti kombëtar</h2>
-            <p class="section-desc" style="text-align:center">Tre faza implementimi — nga 10 nyje pilot deri në 200+ nyje që mbulojnë çdo zonë me rrezik në Shqipëri.</p>
+/* ═══════ CONTRIBUTING FACTORS ═══════ */
+function ContributingFactors({station,lang}){
+  const t=T[lang];
+  const f=[
+    {n:t.moisture,w:0.25,v:station.data.moisture,c:station.soilType==="clay"?65:80},
+    {n:t.slopeAngle,w:0.20,v:station.slopeAngle,c:30},
+    {n:t.soilType,w:0.15,v:null,c:null},
+    {n:t.vibration,w:0.15,v:station.data.vibration?1:0,c:0.5},
+    {n:t.rainfall,w:0.10,v:station.data.rainfall,c:10},
+    {n:t.historicalRisk,w:0.08,v:null,c:null},
+    {n:t.temperature,w:0.04,v:station.data.temperature,c:null},
+    {n:t.pressure,w:0.03,v:station.data.pressure,c:null},
+  ];
+  return(<div style={{display:"flex",flexDirection:"column",gap:4}}>
+    {f.map((x,i)=>{const hi=x.c!=null&&x.v!=null&&x.v>=x.c;return(
+      <div key={i} style={{display:"flex",alignItems:"center",gap:8,fontSize:11}}>
+        <span style={{width:110,color:"#94a3b8",flexShrink:0,fontSize:10}}>{x.n}</span>
+        <div style={{flex:1,height:6,background:"#1e293b",borderRadius:3,overflow:"hidden"}}>
+          <div style={{width:`${x.w*400}%`,height:"100%",background:hi?"#ef4444":"#3b82f6",borderRadius:3,transition:"width 0.5s"}}/>
         </div>
-        <div class="plan-phases">
-            <div class="phase-card phase-1 reveal">
-                <div class="phase-num">Faza 1 — Pilot</div>
-                <h3>10 Nyje</h3>
-                <div class="phase-sub">Viti 1 — Kosto ~3,000&euro;</div>
-                <ul>
-                    <li>Shkodër — Malësi e Madhe</li>
-                    <li>Kukës — Has dhe Tropojë</li>
-                    <li>Dibër — Lurë-Mat</li>
-                    <li>Elbasan — Librazhd-Gramsh</li>
-                    <li>Berat — Skrapar</li>
-                </ul>
-            </div>
-            <div class="phase-card phase-2 reveal">
-                <div class="phase-num">Faza 2 — Zgjerim</div>
-                <h3>50 Nyje</h3>
-                <div class="phase-sub">Vitet 2–3 — 12 prefektura</div>
-                <ul>
-                    <li>Hube rajonale me servera lokalë</li>
-                    <li>Integrim me e-Albania</li>
-                    <li>Platforma e Emergjencave</li>
-                    <li>Redudancë komunikimi</li>
-                </ul>
-            </div>
-            <div class="phase-card phase-3 reveal">
-                <div class="phase-num">Faza 3 — Kombëtar</div>
-                <h3>200+ Nyje</h3>
-                <div class="phase-sub">Vitet 4–5 — Mbulim i plotë</div>
-                <ul>
-                    <li>Dashboard kombëtar i AMSHC-së</li>
-                    <li>Hartë interaktive në kohë reale</li>
-                    <li>AI i ripërmirësuar çdo vit</li>
-                    <li>Kosto totale: 24,000&euro;</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+        <span style={{width:32,textAlign:"right",color:hi?"#ef4444":"#64748b",fontWeight:hi?700:400,fontSize:10}}>{(x.w*100).toFixed(0)}%</span>
+      </div>);})}
+  </div>);
+}
 
-    <!-- PARTNERS -->
-    <section class="section partners" id="partners">
-        <div class="section-center reveal">
-            <div class="section-label">Mbështetje Institucionale</div>
-            <h2 class="section-title" style="text-align:center">Të dhëna zyrtare, partnerë shtetërorë</h2>
-            <p class="section-desc" style="text-align:center">Sistemi është ndërtuar mbi të dhëna zyrtare shqiptare dhe ndërkombëtare, të verifikuara shkencërisht.</p>
-        </div>
-        <div class="partners-logos reveal">
-            <div class="partner">IGJEUM<span>Inst. i Gjeoshkencave, Energjisë, Ujit dhe Mjedisit</span></div>
-            <div class="partner">AKSHI<span>Agjencia Kombëtare e Shoqërisë së Informacionit</span></div>
-            <div class="partner">AMSHC<span>Agjencia e Mbrojtjes Civile dhe Emergjencave</span></div>
-            <div class="partner">UNDP Albania<span>Programi i Kombeve të Bashkuara për Zhvillim</span></div>
-            <div class="partner">NASA FIRMS<span>Fire Information for Resource Management System</span></div>
-        </div>
-    </section>
+/* ═══════ LEAFLET MAP ═══════ */
+function MapView({stations,selectedId,onSelect,lang}){
+  const mapRef=useRef(null),mapObj=useRef(null),markers=useRef({});
+  useEffect(()=>{
+    if(mapObj.current)return;
+    const m=L.map(mapRef.current,{center:[41.0,20.0],zoom:8,zoomControl:false,attributionControl:false});
+    L.control.zoom({position:"bottomleft"}).addTo(m);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{maxZoom:19}).addTo(m);
+    mapObj.current=m;
+    stations.forEach(s=>{
+      const c=getRiskColor(s.data.risk);
+      const icon=L.divIcon({className:"",iconSize:[16,16],iconAnchor:[8,8],html:mkHTML(s,c,false,lang)});
+      const mk=L.marker([s.lat,s.lng],{icon}).addTo(m);
+      mk.on("click",()=>onSelect(s.id));
+      mk.bindTooltip(s.name,{direction:"top",offset:[0,-14],className:"station-tooltip"});
+      markers.current[s.id]=mk;
+    });
+    return()=>{m.remove();mapObj.current=null;markers.current={};};
+  },[]);
+  useEffect(()=>{
+    stations.forEach(s=>{
+      if(!markers.current[s.id]){
+        if(!mapObj.current)return;
+        const c=getRiskColor(s.data.risk);
+        const icon=L.divIcon({className:"",iconSize:[16,16],iconAnchor:[8,8],html:mkHTML(s,c,false,lang)});
+        const nm=L.marker([s.lat,s.lng],{icon}).addTo(mapObj.current);
+        nm.on("click",()=>onSelect(s.id));
+        nm.bindTooltip(s.name,{direction:"top",offset:[0,-14],className:"station-tooltip"});
+        markers.current[s.id]=nm;return;
+      }
+      const mk=markers.current[s.id];
+      const c=getRiskColor(s.data.risk),sel=selectedId===s.id,sz=sel?22:16;
+      mk.setIcon(L.divIcon({className:"",iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],html:mkHTML(s,c,sel,lang)}));
+    });
+    // Remove deleted markers
+    Object.keys(markers.current).forEach(id=>{
+      if(!stations.find(s=>s.id===id)){
+        mapObj.current.removeLayer(markers.current[id]);
+        delete markers.current[id];
+      }
+    });
+  },[stations,selectedId,lang]);
+  return <div ref={mapRef} style={{width:"100%",height:"100%",borderRadius:8}}/>;
+}
 
-    <!-- TEAM -->
-    <section class="section team" id="team">
-        <div class="section-center reveal">
-            <div class="section-label">Ekipi</div>
-            <h2 class="section-title" style="text-align:center">Njihu me ekipin</h2>
-            <p class="section-desc" style="text-align:center">Tre nxënës me një mision — ta bëjnë Shqipërinë më të sigurt.</p>
-        </div>
-        <div class="team-photo-wrap reveal">
-            <img src="team.jpg" alt="Ekipi i TerraNode — Iv Kondo, Luis Lekaj, Ijon Xoxa" loading="lazy">
-        </div>
-        <div class="team-members reveal">
-            <div class="team-member">
-                <div class="member-name">Iv Kondo</div>
-            </div>
-            <div class="team-member">
-                <div class="member-name">Luis Lekaj</div>
-            </div>
-            <div class="team-member">
-                <div class="member-name">Ijon Xoxa</div>
-            </div>
-        </div>
-    </section>
+function mkHTML(s,c,sel,lang){
+  const sz=sel?22:16,bd=sel?"3px solid #1e293b":"2px solid #1e293bdd";
+  const sh=sel?`0 0 20px ${c}cc,0 0 6px rgba(0,0,0,0.4)`:`0 0 10px ${c}88,0 0 4px rgba(0,0,0,0.2)`;
+  const pu=s.isLive?"animation:livePulse 2s infinite;":"";
+  const lb=s.isLive?`<div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#22c55e;color:#000;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.3);">${T[lang].live}</div>`:"";
+  const pr=sel?`<div style="position:absolute;top:50%;left:50%;width:${sz}px;height:${sz}px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid ${c};animation:stationPulse 2s infinite;pointer-events:none;"></div>`:"";
+  return`<div style="position:relative;width:${sz}px;height:${sz}px;">${pr}<div style="width:${sz}px;height:${sz}px;background:${c};border:${bd};border-radius:50%;box-shadow:${sh};cursor:pointer;transition:all 0.3s;${pu}"></div>${lb}</div>`;
+}
 
-    <!-- CTA -->
-    <section class="section cta-section" id="contact">
-        <div class="cta-glow"></div>
-        <div class="cta-inner reveal">
-            <div class="section-label">Revista Jonë</div>
-            <h2 class="section-title" style="max-width:100%">Lexo historinë e plotë<br>të TerraNode.</h2>
-            <p class="cta-quote">Zbulo si e ndërtuam sistemin, sfidat tona, teknologjinë pas tij dhe vizionin për të ardhmen — e gjitha në revistën tonë zyrtare.</p>
-            <div class="cta-buttons">
-                <a href="https://drive.google.com/file/d/1N61BC3HV7pUmz7lW3ScW2B0nE4uuqG75/view" target="_blank" rel="noopener" class="btn-primary">Lexo Revistën</a>
-            </div>
-            <div class="qr-block">
-                <img src="qr-revista.jpg" alt="QR Code — Revista jonë" loading="lazy">
-                <span class="qr-label">Ose skanoni QR code-in</span>
-            </div>
+/* ═══════ STATION SETTINGS PANEL ═══════ */
+function StationSettings({station,lang,onSave,onDelete,onClose,onRefreshWeather}){
+  const t=T[lang];
+  const[f,sF]=useState({
+    name:station.name,lat:String(station.lat),lng:String(station.lng),
+    soilType:station.soilType,slopeAngle:String(station.slopeAngle),
+    elevation:String(station.elevation),historicalRisk:station.historicalRisk,
+    isLive:station.isLive,liveUrl:station.liveUrl||"",
+    owKey:station.owKey||"",firmsKey:station.firmsKey||"",
+  });
+  const[fetching,setFetching]=useState(false);
+  const[confirmDel,setConfirmDel]=useState(false);
+  const u=(k,v)=>sF(p=>({...p,[k]:v}));
+  const iS={background:"#0f172a",border:"1px solid #334155",borderRadius:4,padding:"6px 8px",color:"#e2e8f0",fontSize:11,fontFamily:"'JetBrains Mono'",width:"100%",outline:"none"};
+  const lS={fontSize:9,color:"#64748b",marginBottom:2,textTransform:"uppercase",letterSpacing:0.5};
+
+  const doRefresh=async()=>{
+    if(!f.owKey)return;
+    setFetching(true);
+    await onRefreshWeather(station.id,f.owKey);
+    setFetching(false);
+  };
+
+  const save=()=>{
+    onSave({
+      ...station,name:f.name,lat:parseFloat(f.lat),lng:parseFloat(f.lng),
+      soilType:f.soilType,slopeAngle:parseInt(f.slopeAngle),
+      elevation:parseInt(f.elevation),historicalRisk:f.historicalRisk,
+      isLive:f.isLive,liveUrl:f.liveUrl,owKey:f.owKey,firmsKey:f.firmsKey,
+    });
+    onClose();
+  };
+
+  return(
+    <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}>
+      <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",border:"1px solid #334155",borderRadius:12,padding:24,width:420,maxWidth:"92vw",maxHeight:"90vh",overflow:"auto"}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}>
+          <span style={{fontSize:14,fontWeight:700,color:"#f8fafc"}}>{t.settings} — {station.name}</span>
+          <button onClick={onClose} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:16}}>✕</button>
         </div>
-    </section>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          {/* Basic info */}
+          <div><div style={lS}>{t.name}</div><input value={f.name} onChange={e=>u("name",e.target.value)} style={iS}/></div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.latitude}</div><input value={f.lat} onChange={e=>u("lat",e.target.value)} style={iS}/></div>
+            <div><div style={lS}>{t.longitude}</div><input value={f.lng} onChange={e=>u("lng",e.target.value)} style={iS}/></div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.soilType}</div><select value={f.soilType} onChange={e=>u("soilType",e.target.value)} style={iS}><option value="clay">{t.clay}</option><option value="sandy">{t.sandy}</option><option value="rocky">{t.rocky}</option><option value="mixed">{t.mixed}</option></select></div>
+            <div><div style={lS}>{t.slopeAngle}</div><input value={f.slopeAngle} onChange={e=>u("slopeAngle",e.target.value)} style={iS} type="number"/></div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.elevation}</div><input value={f.elevation} onChange={e=>u("elevation",e.target.value)} style={iS} type="number"/></div>
+            <div><div style={lS}>{t.historicalRisk}</div><select value={f.historicalRisk} onChange={e=>u("historicalRisk",e.target.value)} style={iS}><option value="low">{t.low}</option><option value="medium">{t.medium}</option><option value="high">{t.high}</option></select></div>
+          </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-left">
-                &copy; 2025 TerraNode — Tiranë, Shqipëri
+          {/* Divider */}
+          <div style={{borderTop:"1px solid #1e293b",margin:"4px 0"}}/>
+
+          {/* API Keys */}
+          <div style={{fontSize:11,fontWeight:600,color:"#94a3b8",textTransform:"uppercase",letterSpacing:1}}>{t.apiKeys}</div>
+          <div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={lS}>{t.owKey}</div>
+              {station.weatherSource==="live"&&<span style={{fontSize:8,color:"#22c55e",fontWeight:700,letterSpacing:0.5}}>● {t.weatherLive}</span>}
+              {station.weatherSource==="sim"&&station.owKey&&<span style={{fontSize:8,color:"#f59e0b",fontWeight:600}}>{t.weatherSim}</span>}
             </div>
-            <div class="footer-right">
-                <a href="#problem">Problemi</a>
-                <a href="#how">Si Funksionon</a>
-                <a href="#features">Veçoritë</a>
-                <a href="#plan">Plani</a>
-                <a href="#team">Ekipi</a>
+            <div style={{display:"flex",gap:6}}>
+              <input value={f.owKey} onChange={e=>u("owKey",e.target.value)} style={{...iS,flex:1}} placeholder="abc123def456..."/>
+              <button onClick={doRefresh} disabled={!f.owKey||fetching}
+                style={{background:f.owKey?"#22c55e22":"#0f172a",border:`1px solid ${f.owKey?"#22c55e55":"#334155"}`,
+                  borderRadius:4,padding:"6px 10px",color:f.owKey?"#22c55e":"#475569",cursor:f.owKey?"pointer":"not-allowed",
+                  fontSize:10,fontWeight:600,fontFamily:"'JetBrains Mono'",whiteSpace:"nowrap",
+                  opacity:fetching?0.5:1}}>
+                {fetching?"⟳":"↻"} {fetching?t.fetching:t.refreshNow}
+              </button>
             </div>
-        </div>
-    </footer>
+            {station.lastWeatherFetch&&<div style={{fontSize:9,color:"#475569",marginTop:3}}>{t.lastFetch}: {timeAgo(station.lastWeatherFetch)}</div>}
+          </div>
+          <div>
+            <div style={lS}>{t.firmsKey}</div>
+            <input value={f.firmsKey} onChange={e=>u("firmsKey",e.target.value)} style={iS} placeholder="NASA FIRMS API key..."/>
+          </div>
 
-    <script>
-        // ---- NAV: pill morph on scroll ----
-        const nav = document.getElementById('nav');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', window.scrollY > 60);
-        }, { passive: true });
+          {/* Divider */}
+          <div style={{borderTop:"1px solid #1e293b",margin:"4px 0"}}/>
 
-        // ---- Mobile menu ----
-        const hamburger = document.getElementById('hamburger');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const mobileClose = document.getElementById('mobileClose');
-        hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
-        mobileClose.addEventListener('click', closeMobile);
-        function closeMobile() { mobileMenu.classList.remove('open'); }
+          {/* Live mode */}
+          <div><div style={lS}>{t.mode}</div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>u("isLive",false)} style={{...iS,width:"auto",padding:"6px 14px",background:!f.isLive?"#22c55e15":"#0f172a",border:`1px solid ${!f.isLive?"#22c55e55":"#334155"}`,color:!f.isLive?"#22c55e":"#64748b",cursor:"pointer"}}>{t.simulated}</button>
+              <button onClick={()=>u("isLive",true)} style={{...iS,width:"auto",padding:"6px 14px",background:f.isLive?"#22c55e15":"#0f172a",border:`1px solid ${f.isLive?"#22c55e55":"#334155"}`,color:f.isLive?"#22c55e":"#64748b",cursor:"pointer"}}>{t.live}</button>
+            </div>
+          </div>
+          {f.isLive&&<div><div style={lS}>{t.liveEndpoint}</div><input value={f.liveUrl} onChange={e=>u("liveUrl",e.target.value)} style={iS} placeholder="http://192.168.4.1/api/status"/></div>}
 
-        // ---- Hero typing animation ----
-        (function() {
-            const text = 'Sistemi i parë shqiptar i paralajmërimit me sensorë, AI dhe SMS — me kosto 400 herë më të ulët se alternativat komerciale. I ndërtuar nga nxënës, për Shqipërinë.';
-            const el = document.getElementById('heroTyping');
-            const cursor = document.getElementById('heroCursor');
-            if (!el) return;
-            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (prefersReduced) { el.textContent = text; cursor.style.display = 'none'; return; }
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    el.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, 18 + Math.random() * 22);
-                } else {
-                    setTimeout(() => { cursor.style.animation = 'none'; cursor.style.opacity = '0'; cursor.style.transition = 'opacity .5s'; }, 2000);
-                }
+          {/* Actions */}
+          <div style={{display:"flex",gap:8,marginTop:4}}>
+            <button onClick={save} style={{flex:1,padding:"8px",background:"#22c55e",color:"#000",border:"none",borderRadius:6,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'JetBrains Mono'"}}>{t.save}</button>
+            {!confirmDel?
+              <button onClick={()=>setConfirmDel(true)} style={{padding:"8px 12px",background:"transparent",color:"#ef4444",border:"1px solid rgba(239,68,68,0.3)",borderRadius:6,fontSize:11,cursor:"pointer",fontFamily:"'JetBrains Mono'"}}>{t.deleteStation}</button>
+              :<button onClick={()=>{onDelete(station.id);onClose();}} style={{padding:"8px 12px",background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid #ef4444",borderRadius:6,fontSize:11,cursor:"pointer",fontFamily:"'JetBrains Mono'",fontWeight:700}}>{t.confirmDelete}</button>
             }
-            setTimeout(type, 1200);
-        })();
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        // ---- Scroll reveal (fade up) ----
-        const reveals = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
+/* ═══════ ADD STATION PANEL ═══════ */
+function AddStationPanel({lang,onAdd,onClose}){
+  const t=T[lang];
+  const[f,sF]=useState({name:"",lat:"",lng:"",soilType:"clay",slopeAngle:"25",elevation:"300",historicalRisk:"medium",isLive:false,liveUrl:"",owKey:"",firmsKey:""});
+  const u=(k,v)=>sF(p=>({...p,[k]:v}));
+  const iS={background:"#0f172a",border:"1px solid #334155",borderRadius:4,padding:"6px 8px",color:"#e2e8f0",fontSize:11,fontFamily:"'JetBrains Mono'",width:"100%",outline:"none"};
+  const lS={fontSize:9,color:"#64748b",marginBottom:2,textTransform:"uppercase",letterSpacing:0.5};
+  const go=()=>{if(!f.name||!f.lat||!f.lng)return;onAdd({id:"c-"+Date.now(),name:f.name,lat:parseFloat(f.lat),lng:parseFloat(f.lng),soilType:f.soilType,slopeAngle:parseInt(f.slopeAngle),elevation:parseInt(f.elevation),historicalRisk:f.historicalRisk,isLive:f.isLive,liveUrl:f.liveUrl,owKey:f.owKey,firmsKey:f.firmsKey,baseRisk:12,weatherSource:"sim",lastWeatherFetch:null,data:{moisture:20,vibration:false,temperature:16,pressure:1015,rainfall:0,humidity:55,windSpeed:1.5,risk:12}});onClose();};
+  return(
+    <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}>
+      <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",border:"1px solid #334155",borderRadius:12,padding:24,width:380,maxWidth:"90vw"}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}>
+          <span style={{fontSize:14,fontWeight:700,color:"#f8fafc"}}>{t.addStation}</span>
+          <button onClick={onClose} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:16}}>✕</button>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div><div style={lS}>{t.name}</div><input value={f.name} onChange={e=>u("name",e.target.value)} style={iS} placeholder="e.g. Berat"/></div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.latitude}</div><input value={f.lat} onChange={e=>u("lat",e.target.value)} style={iS} placeholder="41.33"/></div>
+            <div><div style={lS}>{t.longitude}</div><input value={f.lng} onChange={e=>u("lng",e.target.value)} style={iS} placeholder="19.82"/></div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.soilType}</div><select value={f.soilType} onChange={e=>u("soilType",e.target.value)} style={iS}><option value="clay">{t.clay}</option><option value="sandy">{t.sandy}</option><option value="rocky">{t.rocky}</option><option value="mixed">{t.mixed}</option></select></div>
+            <div><div style={lS}>{t.slopeAngle}</div><input value={f.slopeAngle} onChange={e=>u("slopeAngle",e.target.value)} style={iS} type="number"/></div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div><div style={lS}>{t.elevation}</div><input value={f.elevation} onChange={e=>u("elevation",e.target.value)} style={iS} type="number"/></div>
+            <div><div style={lS}>{t.historicalRisk}</div><select value={f.historicalRisk} onChange={e=>u("historicalRisk",e.target.value)} style={iS}><option value="low">{t.low}</option><option value="medium">{t.medium}</option><option value="high">{t.high}</option></select></div>
+          </div>
+          <div><div style={lS}>{t.owKey}</div><input value={f.owKey} onChange={e=>u("owKey",e.target.value)} style={iS} placeholder="OpenWeather API key (optional)"/></div>
+          <div style={{display:"flex",gap:8,marginTop:4}}>
+            <button onClick={go} style={{flex:1,padding:"8px",background:"#22c55e",color:"#000",border:"none",borderRadius:6,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'JetBrains Mono'"}}>{t.save}</button>
+            <button onClick={onClose} style={{flex:1,padding:"8px",background:"transparent",color:"#64748b",border:"1px solid #334155",borderRadius:6,fontSize:12,cursor:"pointer",fontFamily:"'JetBrains Mono'"}}>{t.cancel}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════ MAIN DASHBOARD ═══════ */
+function TerraNodeDashboard(){
+  const[lang,setLang]=useState("sq");
+  const[selId,setSelId]=useState(null);
+  const[stations,setStations]=useState(STATIONS_INIT);
+  const[tsMap,setTsMap]=useState(()=>{const m={};STATIONS_INIT.forEach(s=>{m[s.id]=genTS(s)});return m;});
+  const[alerts,setAlerts]=useState([]);
+  const[showAdd,setShowAdd]=useState(false);
+  const[editId,setEditId]=useState(null);
+  const[banner,setBanner]=useState(null);
+  const weatherTimers=useRef({});
+  const liveTimers=useRef({});
+  const t=T[lang];
+  const sel=stations.find(s=>s.id===selId);
+  const editStation=editId?stations.find(s=>s.id===editId):null;
+  const tsData=selId&&tsMap[selId]?tsMap[selId]:Object.values(tsMap)[0]||[];
+
+  // Fetch live data from Pi endpoint for a station
+  const doLiveFetch=useCallback(async(stationId)=>{
+    const st=stations.find(s=>s.id===stationId);
+    if(!st||!st.isLive||!st.liveUrl)return;
+    const result=await fetchPiLiveData(st.liveUrl);
+    setStations(prev=>prev.map(s=>{
+      if(s.id!==stationId)return s;
+      if(result.success){
+        return{...s,piConnected:true,lastPiFetch:Date.now(),
+          data:{...s.data,moisture:result.moisture,vibration:result.vibration,
+            temperature:result.temperature,pressure:result.pressure,
+            rainfall:result.rainfall,humidity:result.humidity,
+            windSpeed:result.windSpeed,risk:result.risk}};
+      }else{
+        return{...s,piConnected:false};
+      }
+    }));
+  },[stations]);
+
+  // Auto-poll live stations every 5 seconds
+  useEffect(()=>{
+    Object.values(liveTimers.current).forEach(clearInterval);
+    liveTimers.current={};
+    stations.forEach(s=>{
+      if(s.isLive&&s.liveUrl){
+        doLiveFetch(s.id);
+        liveTimers.current[s.id]=setInterval(()=>doLiveFetch(s.id),5000);
+      }
+    });
+    return()=>Object.values(liveTimers.current).forEach(clearInterval);
+  },[stations.map(s=>s.id+s.isLive+s.liveUrl).join(",")]);
+
+  // Fetch weather for a station
+  const doWeatherFetch=useCallback(async(stationId,apiKey)=>{
+    const st=stations.find(s=>s.id===stationId);
+    if(!st||!apiKey)return;
+    const result=await fetchOpenWeather(st.lat,st.lng,apiKey);
+    if(result.success){
+      setStations(prev=>prev.map(s=>s.id===stationId?{...s,
+        weatherSource:"live",lastWeatherFetch:Date.now(),owKey:apiKey,
+        data:{...s.data,temperature:result.temperature,pressure:result.pressure,
+          humidity:result.humidity,windSpeed:result.windSpeed,rainfall:result.rainfall}
+      }:s));
+    }
+  },[stations]);
+
+  // Setup 20-min weather auto-fetch for stations with API keys
+  useEffect(()=>{
+    // Clear old timers
+    Object.values(weatherTimers.current).forEach(clearInterval);
+    weatherTimers.current={};
+    // Set new timers
+    stations.forEach(s=>{
+      if(s.owKey){
+        // Initial fetch
+        doWeatherFetch(s.id,s.owKey);
+        // 20 minute interval
+        weatherTimers.current[s.id]=setInterval(()=>{
+          doWeatherFetch(s.id,s.owKey);
+        },20*60*1000);
+      }
+    });
+    return()=>Object.values(weatherTimers.current).forEach(clearInterval);
+  },[stations.map(s=>s.id+s.owKey).join(",")]);
+
+  // Simulation tick
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      setStations(prev=>{
+        const next=prev.map(simStep);
+        next.forEach(s=>{const old=prev.find(p=>p.id===s.id);if(old){
+          if((old.data.risk<30&&s.data.risk>=30)||(old.data.risk<70&&s.data.risk>=70)){
+            const lv=s.data.risk>=70?"RED":"YELLOW";
+            const al={id:Date.now()+Math.random(),station:s.name,risk:s.data.risk,level:lv,time:new Date().toLocaleTimeString()};
+            setAlerts(a=>[al,...a].slice(0,20));setBanner(al);setTimeout(()=>setBanner(null),5000);
+          }}});
+        // Append current readings to time series
+        setTsMap(p=>{
+          const m={...p};
+          next.forEach(s=>{
+            const arr=m[s.id]?[...m[s.id]]:[];
+            arr.push({
+              time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
+              timestamp:Date.now(),moisture:s.data.moisture,temperature:s.data.temperature,
+              pressure:s.data.pressure,risk:s.data.risk,
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-        reveals.forEach(el => observer.observe(el));
-
-        // ---- Section label slide-in ----
-        const labels = document.querySelectorAll('.section-label');
-        const labelObs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
-                    labelObs.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.5 });
-        labels.forEach(el => labelObs.observe(el));
-
-        // ---- Section title word-by-word reveal ----
-        document.querySelectorAll('.section-title').forEach(title => {
-            if (title.closest('.hero')) return;
-            const words = title.innerHTML.split(/(\s+|<br\s*\/?>)/);
-            title.innerHTML = words.map(w => {
-                if (/^\s+$/.test(w) || /<br/.test(w)) return w;
-                return '<span class="word">' + w + '</span>';
-            }).join(' ');
-            title.classList.add('word-reveal');
+            // Keep max 96 points (24h at 15min, but we append every 3s — trim old)
+            if(arr.length>200)arr.splice(0,arr.length-200);
+            m[s.id]=arr;
+          });
+          return m;
         });
-        const wordObs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const words = entry.target.querySelectorAll('.word');
-                    words.forEach((w, i) => { w.style.transitionDelay = (i * 60) + 'ms'; });
-                    entry.target.classList.add('animate');
-                    wordObs.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        document.querySelectorAll('.word-reveal').forEach(el => wordObs.observe(el));
+        return next;});
+    },3000);return()=>clearInterval(iv);
+  },[]);
 
-        // ---- Stat counter pop + count-up ----
-        const stats = document.querySelectorAll('.stat');
-        const statObs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const idx = Array.from(stats).indexOf(entry.target);
-                    setTimeout(() => { entry.target.classList.add('pop'); }, idx * 120);
-                    statObs.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.3 });
-        stats.forEach(el => statObs.observe(el));
+  const addSt=s=>{setStations(p=>[...p,s]);setTsMap(p=>({...p,[s.id]:genTS(s)}));};
+  const updateSt=s=>{setStations(p=>p.map(x=>x.id===s.id?{...x,...s}:x));};
+  const deleteSt=id=>{setStations(p=>p.filter(s=>s.id!==id));if(selId===id)setSelId(null);};
 
-        // Animate the percentage counter
-        const statEl = document.querySelector('[data-count]');
-        if (statEl) {
-            const target = parseFloat(statEl.dataset.count);
-            const countObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        let current = 0;
-                        const step = target / 60;
-                        const timer = setInterval(() => {
-                            current += step;
-                            if (current >= target) { current = target; clearInterval(timer); }
-                            statEl.textContent = current.toFixed(1) + '%';
-                        }, 16);
-                        countObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.5 });
-            countObserver.observe(statEl);
-        }
-    </script>
+  const cnt=stations.length;
+  const avg=(stations.reduce((a,s)=>a+s.data.risk,0)/stations.length).toFixed(1);
+  const laText=alerts.length>0?`${alerts[0].station} — ${alerts[0].risk.toFixed(0)}%`:t.noAlerts;
+  const laColor=alerts.length>0?(alerts[0].level==="RED"?"#ef4444":"#f59e0b"):"#64748b";
+  const owLiveCount=stations.filter(s=>s.weatherSource==="live").length;
+  const piLiveCount=stations.filter(s=>s.piConnected).length;
+
+  const card={background:"linear-gradient(135deg,#0f172aee,#1e293bee)",border:"1px solid #1e293b",borderRadius:8,padding:14};
+  const sC=a=>({background:a?"rgba(239,68,68,0.08)":"rgba(30,41,59,0.6)",border:`1px solid ${a?"rgba(239,68,68,0.3)":"#334155"}`,borderRadius:6,padding:"10px 12px",display:"flex",flexDirection:"column",gap:4});
+  const sL={fontSize:10,color:"#64748b",marginBottom:6,textTransform:"uppercase",letterSpacing:1};
+
+  return(
+    <div style={{width:"100%",height:"100vh",background:"linear-gradient(180deg,#020617 0%,#0a0f1a 30%,#0f172a 100%)",color:"#e2e8f0",fontFamily:"'JetBrains Mono',monospace",fontSize:13,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
+      {banner&&<div style={{position:"absolute",top:52,left:"50%",zIndex:9998,background:banner.level==="RED"?"rgba(239,68,68,0.15)":"rgba(245,158,11,0.15)",border:`1px solid ${banner.level==="RED"?"#ef4444":"#f59e0b"}`,borderRadius:8,padding:"8px 20px",backdropFilter:"blur(10px)",animation:"alertBanner 5s forwards",display:"flex",alignItems:"center",gap:10,boxShadow:`0 4px 20px ${banner.level==="RED"?"rgba(239,68,68,0.3)":"rgba(245,158,11,0.3)"}`}}>
+        <span style={{fontSize:16}}>{banner.level==="RED"?"🔴":"🟡"}</span>
+        <span style={{fontSize:12,fontWeight:600,color:banner.level==="RED"?"#ef4444":"#f59e0b"}}>{banner.station} — {banner.risk.toFixed(0)}% {getRiskLabel(banner.risk,lang)}</span>
+      </div>}
+      {showAdd&&<AddStationPanel lang={lang} onAdd={addSt} onClose={()=>setShowAdd(false)}/>}
+      {editStation&&<StationSettings station={editStation} lang={lang} onSave={updateSt} onDelete={deleteSt} onClose={()=>setEditId(null)} onRefreshWeather={doWeatherFetch}/>}
+
+      {/* HEADER */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 20px",borderBottom:"1px solid #1e293b",background:"rgba(2,6,23,0.8)",backdropFilter:"blur(10px)",flexShrink:0,zIndex:100}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:32,height:32,borderRadius:6,background:"linear-gradient(135deg,#22c55e,#16a34a)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:16,color:"#000",boxShadow:"0 0 12px rgba(34,197,94,0.3)"}}>T</div>
+          <div><div style={{fontSize:15,fontWeight:700,letterSpacing:1,color:"#f8fafc"}}>{t.subtitle}</div>
+          <div style={{fontSize:10,color:"#64748b",letterSpacing:0.5,marginTop:1}}>{t.title}</div></div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setShowAdd(true)} title={t.addStation} style={{background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:6,padding:"5px 10px",color:"#22c55e",cursor:"pointer",fontSize:11,fontWeight:600,fontFamily:"'JetBrains Mono'"}}>+ {t.addStation}</button>
+          <div style={{display:"flex",gap:0,borderRadius:6,overflow:"hidden",border:"1px solid #334155"}}>
+            {["sq","en"].map(l=>(<button key={l} onClick={()=>setLang(l)} style={{padding:"5px 14px",background:lang===l?"#22c55e":"transparent",color:lang===l?"#000":"#64748b",border:"none",cursor:"pointer",fontSize:11,fontWeight:600,fontFamily:"'JetBrains Mono',monospace"}}>{l.toUpperCase()}</button>))}
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN */}
+      <div style={{flex:1,display:"flex",gap:12,padding:12,overflow:"hidden",minHeight:0}}>
+        {/* MAP */}
+        <div style={{flex:"0 0 60%",...card,padding:0,overflow:"hidden",position:"relative"}}>
+          <MapView stations={stations} selectedId={selId} onSelect={setSelId} lang={lang}/>
+          <div style={{position:"absolute",top:12,left:12,zIndex:1000,background:"rgba(2,6,23,0.85)",backdropFilter:"blur(8px)",padding:"6px 12px",borderRadius:6,border:"1px solid #1e293b",fontSize:10,color:"#64748b"}}>{t.stations}: <span style={{color:"#22c55e",fontWeight:600}}>{cnt}</span> {t.online}</div>
+        </div>
+
+        {/* RIGHT PANEL */}
+        <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,overflow:"auto",minWidth:0}}>
+          {sel?(<div style={{...card,display:"flex",flexDirection:"column",gap:12}}>
+            {/* Header with settings button */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16,fontWeight:700,color:"#f8fafc"}}>{sel.name}</span>
+                  {sel.isLive&&<span style={{fontSize:9,background:sel.piConnected?"#22c55e":"#ef4444",color:sel.piConnected?"#000":"#fff",padding:"2px 6px",borderRadius:3,fontWeight:700}}>{sel.piConnected?"● CONNECTED":"● OFFLINE"}</span>}
+                  <button onClick={()=>setEditId(sel.id)} style={{background:"rgba(30,41,59,0.6)",border:"1px solid #334155",borderRadius:4,padding:"2px 6px",color:"#64748b",cursor:"pointer",fontSize:12,lineHeight:1}} title={t.settings}>⚙</button>
+                  {sel.isLive&&sel.liveUrl&&<button onClick={()=>doLiveFetch(sel.id)} style={{background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:4,padding:"2px 6px",color:"#22c55e",cursor:"pointer",fontSize:9,fontWeight:600,fontFamily:"'JetBrains Mono'"}}>↻ {t.refreshNow}</button>}
+                </div>
+                <div style={{fontSize:10,color:"#64748b",marginTop:2}}>{sel.lat.toFixed(3)}°N, {sel.lng.toFixed(3)}°E</div>
+              </div>
+              <div style={{width:64,height:64,borderRadius:"50%",background:`radial-gradient(circle,${getRiskColor(sel.data.risk)}22,transparent)`,border:`3px solid ${getRiskColor(sel.data.risk)}`,boxShadow:getRiskGlow(sel.data.risk),display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",transition:"all 0.5s"}}>
+                <span style={{fontSize:18,fontWeight:700,color:getRiskColor(sel.data.risk)}}>{sel.data.risk.toFixed(0)}%</span>
+                <span style={{fontSize:7,fontWeight:600,color:getRiskColor(sel.data.risk),letterSpacing:0.5}}>{getRiskLabel(sel.data.risk,lang)}</span>
+              </div>
+            </div>
+
+            {/* Sensors */}
+            <div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",...sL}}>
+              <span>{t.sensorReadings}</span>
+              {sel.piConnected&&<span style={{fontSize:8,color:"#22c55e",fontWeight:700,background:"rgba(34,197,94,0.1)",padding:"2px 6px",borderRadius:3,border:"1px solid rgba(34,197,94,0.2)",textTransform:"none"}}>● Pi {t.live} — {sel.lastPiFetch?timeAgo(sel.lastPiFetch):""}</span>}
+            </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <div style={sC(sel.data.moisture>65)}><span style={{fontSize:9,color:"#64748b"}}>{t.moisture}</span><span style={{fontSize:18,fontWeight:700,color:sel.data.moisture>65?"#ef4444":"#3b82f6"}}>{sel.data.moisture}%</span></div>
+                <div style={sC(sel.data.vibration)}><span style={{fontSize:9,color:"#64748b"}}>{t.vibration}</span><span style={{fontSize:18,fontWeight:700,color:sel.data.vibration?"#ef4444":"#22c55e"}}>{sel.data.vibration?t.yes:t.no}</span></div>
+                <div style={sC(false)}><span style={{fontSize:9,color:"#64748b"}}>{t.temperature}</span><span style={{fontSize:18,fontWeight:700,color:"#f59e0b"}}>{sel.data.temperature}°C</span></div>
+                <div style={sC(sel.data.pressure<1005)}><span style={{fontSize:9,color:"#64748b"}}>{t.pressure}</span><span style={{fontSize:18,fontWeight:700,color:sel.data.pressure<1005?"#f59e0b":"#94a3b8"}}>{sel.data.pressure} hPa</span></div>
+              </div>
+            </div>
+
+            {/* Weather with source badge + refresh */}
+            <div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                <div style={sL}>{t.weatherData}</div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  {sel.weatherSource==="live"?
+                    <span style={{fontSize:8,color:"#22c55e",fontWeight:700,background:"rgba(34,197,94,0.1)",padding:"2px 6px",borderRadius:3,border:"1px solid rgba(34,197,94,0.2)"}}>● {t.weatherLive}</span>
+                    :<span style={{fontSize:8,color:"#64748b",fontWeight:600,background:"rgba(100,116,139,0.1)",padding:"2px 6px",borderRadius:3}}>{t.weatherSim}</span>
+                  }
+                  {sel.owKey&&<button onClick={()=>doWeatherFetch(sel.id,sel.owKey)}
+                    style={{background:"none",border:"1px solid #334155",borderRadius:3,padding:"2px 6px",color:"#64748b",cursor:"pointer",fontSize:9,fontFamily:"'JetBrains Mono'"}}>↻</button>}
+                  {sel.lastWeatherFetch&&<span style={{fontSize:8,color:"#475569"}}>{timeAgo(sel.lastWeatherFetch)}</span>}
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+                {[{l:t.rainfall,v:`${sel.data.rainfall} mm/h`,c:"#3b82f6"},{l:t.humidity,v:`${sel.data.humidity}%`,c:"#06b6d4"},{l:t.windSpeed,v:`${sel.data.windSpeed} m/s`,c:"#8b5cf6"}].map((w,i)=>(
+                  <div key={i} style={{background:"rgba(30,41,59,0.4)",borderRadius:6,padding:"8px 10px",border:"1px solid #1e293b"}}><div style={{fontSize:9,color:"#64748b"}}>{w.l}</div><div style={{fontSize:14,fontWeight:600,color:w.c,marginTop:2}}>{w.v}</div></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Static params */}
+            <div><div style={sL}>{t.staticParams}</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {[{l:t.soilType,v:t[sel.soilType]||sel.soilType},{l:t.slopeAngle,v:`${sel.slopeAngle}°`},{l:t.elevation,v:`${sel.elevation}m`},{l:t.historicalRisk,v:t[sel.historicalRisk]||sel.historicalRisk}].map((p,i)=>(
+                  <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 10px",background:"rgba(30,41,59,0.3)",borderRadius:4,border:"1px solid #1e293b"}}><span style={{fontSize:10,color:"#64748b"}}>{p.l}</span><span style={{fontSize:11,fontWeight:600,color:"#cbd5e1"}}>{p.v}</span></div>
+                ))}
+              </div>
+            </div>
+
+            <div><div style={sL}>{t.contributing}</div><ContributingFactors station={sel} lang={lang}/></div>
+
+            {alerts.filter(a=>a.station===sel.name).length>0&&(<div><div style={sL}>{t.alertHistory}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:4,maxHeight:80,overflow:"auto"}}>
+                {alerts.filter(a=>a.station===sel.name).map(a=>(
+                  <div key={a.id} style={{display:"flex",justifyContent:"space-between",fontSize:10,padding:"4px 8px",background:a.level==="RED"?"rgba(239,68,68,0.1)":"rgba(245,158,11,0.1)",borderRadius:4,border:`1px solid ${a.level==="RED"?"rgba(239,68,68,0.2)":"rgba(245,158,11,0.2)"}`}}>
+                    <span style={{color:a.level==="RED"?"#ef4444":"#f59e0b"}}>{a.level} — {a.risk.toFixed(0)}%</span><span style={{color:"#64748b"}}>{a.time}</span>
+                  </div>))}
+              </div>
+            </div>)}
+          </div>):(<div style={{...card,display:"flex",alignItems:"center",justifyContent:"center",minHeight:200,color:"#475569"}}><div style={{textAlign:"center"}}><div style={{fontSize:32,marginBottom:8,opacity:0.3}}>◉</div><div style={{fontSize:12}}>{t.selectStation}</div></div></div>)}
+
+          {/* GRAPHS */}
+          <div style={{...card,display:"flex",flexDirection:"column",gap:10}}>
+            <div style={sL}>{t.graphs24h}{sel?` — ${sel.name}`:""}</div>
+            {[{l:t.moistureGraph,k:"moisture",c:"#3b82f6",u:"%",th:[{value:65,color:"#ef4444"},{value:30,color:"#22c55e"}]},
+              {l:t.riskGraph,k:"risk",c:"#ef4444",u:"%",th:[{value:70,color:"#ef4444"},{value:30,color:"#f59e0b"}]},
+              {l:t.tempPressure,k:"temperature",c:"#f59e0b",u:"°C",th:[]}
+            ].map((g,i)=>(
+              <div key={i} style={{background:"rgba(15,23,42,0.5)",borderRadius:6,padding:"8px 10px",border:"1px solid #1e293b"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                  <span style={{fontSize:10,color:"#94a3b8"}}>{g.l}</span>
+                  <span style={{fontSize:11,fontWeight:600,color:g.c}}>{tsData.length>0?tsData[tsData.length-1][g.k]:"—"}{g.u}</span>
+                </div>
+                <InteractiveGraph data={tsData} dataKey={g.k} color={g.c} unit={g.u} thresholds={g.th}/>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* STATUS BAR */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 20px",borderTop:"1px solid #1e293b",background:"rgba(2,6,23,0.9)",backdropFilter:"blur(10px)",fontSize:11,flexShrink:0,gap:20,flexWrap:"wrap"}}>
+        {[{l:t.stations,v:`${cnt} ${t.online}`,c:"#22c55e",d:true},
+          {l:t.avgRisk,v:`${avg}%`,c:getRiskColor(parseFloat(avg))},
+          {l:t.lastAlert,v:laText,c:laColor},
+          {l:t.firmsStatus,v:`${t.active} — ${t.lastCheck}: 6h`,c:"#f59e0b"},
+          {l:t.weatherStatus,v:owLiveCount>0?`${owLiveCount}/${cnt} ${t.weatherLive}`:t.active,c:owLiveCount>0?"#22c55e":"#3b82f6"},
+        ].map((x,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:6}}>
+            {x.d&&<div style={{width:6,height:6,borderRadius:"50%",background:x.c,boxShadow:`0 0 6px ${x.c}88`}}/>}
+            <span style={{color:"#475569"}}>{x.l}:</span><span style={{color:x.c,fontWeight:500}}>{x.v}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<TerraNodeDashboard/>);
+</script>
 </body>
 </html>
